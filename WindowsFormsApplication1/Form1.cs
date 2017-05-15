@@ -67,6 +67,8 @@ namespace WindowsFormsApplication1
         private static int[] backgroundRGBLevel;
         private static byte[] colorPixels;
 
+        private RgbdReader _reader;
+
         /// <summary>
         /// Initialize form
         /// </summary>
@@ -80,6 +82,7 @@ namespace WindowsFormsApplication1
                 extRbtn.Enabled = true;
                 extRbtn.Checked = true;
             }
+            _reader = new RgbdReader();
         }
 
         /// <summary>
@@ -819,7 +822,7 @@ namespace WindowsFormsApplication1
             //openFileDialog2.InitialDirectory = Directory.GetDirectories(Directory.GetDirectories(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()).ToString()).ToString(), "Record*")[0], "Sample*")[0];
             if (intRbtn.Checked == true)
             {
-                openFileDialog2.InitialDirectory = Directory.GetDirectories(Directory.GetDirectories(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()).ToString()).ToString(), "Record*")[0], "Kinect*")[0];
+                openFileDialog2.InitialDirectory = Directory.GetDirectories(Directory.GetDirectories(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()).ToString()).ToString(), "RGB_D R*")[0], "Kinect*")[0];
             }
             if (extRbtn.Checked == true)
             {
