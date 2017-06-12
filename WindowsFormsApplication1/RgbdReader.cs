@@ -37,8 +37,6 @@ namespace WindowsFormsApplication1
         {
             _nFrames = 0;
             _frameNumber = -1;
-
-            load(@"C:\Users\AC lab\Desktop\Depth\Kinect_filename_2017-04-09-10-10-57");
         }
         public void close()
         {
@@ -102,13 +100,14 @@ namespace WindowsFormsApplication1
             // load rgb frames
             if(File.Exists(rgbPath))
             {
-                AForge.Video.FFMPEG.VideoFileReader _rgbReader = new AForge.Video.FFMPEG.VideoFileReader();
+                _rgbReader = new VideoFileReader();
                 _rgbReader.Open(rgbPath);
             }
 
-            advanceFrame();
             return true;
         }
+        public event EventHandler FrameAdvanced;
+
         public long size()
         {
             return _nFrames;
@@ -120,7 +119,13 @@ namespace WindowsFormsApplication1
         public void advanceFrame(long n=1)
         {
             for (int i = 0; i < n; i++)
+            {
                 advanceOneFrame();
+            }
+            if (FrameAdvanced != null)
+                FrameAdvanced(this, EventArgs.Empty);
+            if(n > 1)
+                System.Console.WriteLine("advanced to frame: {0}", _frameNumber);
         }
         private void advanceOneFrame()
         {
@@ -134,6 +139,7 @@ namespace WindowsFormsApplication1
                 if (hasRGB())
                     advanceRGB();
                 _frameNumber++;
+                //System.Console.WriteLine("Frame: {0}", _frameNumber);
             }
         }
         private void advanceTime()
@@ -161,8 +167,11 @@ namespace WindowsFormsApplication1
             if(frameNumber < cur)
             {
                 reload();
-                advanceFrame(frameNumber);
-            } else
+                System.Console.WriteLine("initial frame {0}, fn: {1}", _frameNumber, frameNumber);
+                advanceFrame(frameNumber+1);
+                System.Console.WriteLine("final frame {0}", _frameNumber);
+            }
+            else
             {
                 advanceFrame(frameNumber - cur);
             }
@@ -187,6 +196,10 @@ namespace WindowsFormsApplication1
         }
         public Bitmap getDepthBitmap()
         {
+            if(!hasDepth())
+            {
+                return new Bitmap(depthWidth, depthHeight);
+            }
             byte[] arr = new byte[depthWidth*depthHeight];
 
             Int16 frameMin, frameMax;
@@ -199,6 +212,13 @@ namespace WindowsFormsApplication1
                     frameMin = Math.Min(v, frameMin);
                     frameMax = Math.Max(v, frameMax);
                 }
+            }
+
+//            System.Console.WriteLine("frameMin: {0}, frameMax: {1}", frameMin, frameMax);
+            if(frameMin >= frameMax)
+            {
+                frameMin = 0;
+                frameMax = 1;
             }
 
             int idx = 0;
@@ -230,7 +250,14 @@ namespace WindowsFormsApplication1
         }
         public Bitmap getRGBBitmap()
         {
-            return _curRGB;
+            if (hasRGB())
+                return _curRGB;
+            else
+                return new Bitmap(5,5);
+        }
+        public bool atEnd()
+        {
+            return _frameNumber >= (_nFrames - 1);
         }
         // getDepthFrame
         // getRGBFrame()
