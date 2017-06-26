@@ -24,6 +24,7 @@ namespace WindowsFormsApplication1
         private RgbdReader _reader;
         private System.Timers.Timer _playbackTimer;
         private bool _paused = true;
+        //private DepthCompress _dc;
 
         private void setFrames()
         {
@@ -33,6 +34,9 @@ namespace WindowsFormsApplication1
                 {
                     pictureDepth.Image = _reader.getDepthBitmap();
                     pictureRGB.Image = _reader.getRGBBitmap();
+
+                    //_dc.addFrame(_reader.getDepthValues());
+
                     if(_reader.size() >= 1)
                     {
                         frameProgress.Maximum = (int)_reader.size() - 1;
@@ -75,6 +79,7 @@ namespace WindowsFormsApplication1
             _playbackTimer = new System.Timers.Timer(60);
             _playbackTimer.Elapsed += (sender, e) => playFrame();
             _reader = new RgbdReader();
+            //_dc = new DepthCompress(512, 424);
             _reader.FrameAdvanced += (sender, e) => setFrames();
             _playbackTimer.Start();
             btnPlay.Enabled = false;
@@ -133,6 +138,7 @@ namespace WindowsFormsApplication1
                 string dirname = Directory.GetParent(ofd.FileName).FullName;
                 videoDir.Text = dirname;
                 _reader.load(dirname);
+                //_dc.setDir(dirname);
                 _reader.advanceFrame();
                 btnPlay.Enabled = true;
             }

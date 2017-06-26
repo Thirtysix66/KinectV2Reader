@@ -29,8 +29,8 @@ namespace WindowsFormsApplication1
         private DateTime _curTime;
         private Bitmap _curRGB;
 
-        private const int depthWidth=512;
-        private const int depthHeight=424;
+        private const int depthWidth = 512;
+        private const int depthHeight = 424;
 
 
         public RgbdReader()
@@ -89,7 +89,7 @@ namespace WindowsFormsApplication1
             Console.WriteLine("Frames: {0}", size());
 
             // Load depth frames
-            if(File.Exists(depthPath))
+            if (File.Exists(depthPath))
             {
                 FileStream depthFile = File.Open(depthPath, FileMode.Open, FileAccess.Read);
                 GZipStream gzReader = new GZipStream(depthFile, CompressionMode.Decompress);
@@ -98,7 +98,7 @@ namespace WindowsFormsApplication1
             }
 
             // load rgb frames
-            if(File.Exists(rgbPath))
+            if (File.Exists(rgbPath))
             {
                 _rgbReader = new VideoFileReader();
                 _rgbReader.Open(rgbPath);
@@ -116,7 +116,7 @@ namespace WindowsFormsApplication1
         {
             return _frameNumber;
         }
-        public void advanceFrame(long n=1)
+        public void advanceFrame(long n = 1)
         {
             for (int i = 0; i < n; i++)
             {
@@ -124,17 +124,17 @@ namespace WindowsFormsApplication1
             }
             if (FrameAdvanced != null)
                 FrameAdvanced(this, EventArgs.Empty);
-            if(n > 1)
+            if (n > 1)
                 System.Console.WriteLine("advanced to frame: {0}", _frameNumber);
         }
         private void advanceOneFrame()
         {
             if (!isLoaded())
                 return;
-            if(_frameNumber < (size()-1))
+            if (_frameNumber < (size() - 1))
             {
                 advanceTime();
-                if(hasDepth())
+                if (hasDepth())
                     advanceDepth();
                 if (hasRGB())
                     advanceRGB();
@@ -156,6 +156,10 @@ namespace WindowsFormsApplication1
             for (int i = 0; i < depthWidth; i++)
                 for (int j = 0; j < depthHeight; j++)
                     _curDepth[i, j] += _depthReader.ReadInt16();
+        }
+        public Int16[,] getDepthValues()
+        {
+            return _curDepth;
         }
         private void advanceRGB()
         {
